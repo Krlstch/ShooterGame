@@ -1,7 +1,7 @@
 import pygame
 from Char import Char
 from Observer import Observer
-from Enemy import Enemy
+from EnemyGrunt import EnemyGrunt
 
 
 def draw(gameDisplay, char, bullets, enemies):

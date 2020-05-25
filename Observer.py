@@ -1,5 +1,5 @@
 import random
-from Enemy import Enemy
+from EnemyGrunt import EnemyGrunt
 
 
 class Observer:
@@ -10,8 +10,8 @@ class Observer:
         self.enemies = set()
         self.char = None
         self.enemy_time = 0
-        self.max_enemy_time = 120
-        self.min_enemy_time = 60
+        self.max_enemy_time = 20
+        self.min_enemy_time = 1
 
     def add_bullet(self, bullet):
         self.bullets.add(bullet)
@@ -24,31 +24,28 @@ class Observer:
 
     def update_bullets(self):
         deleted_bullets = []
+        deleted_enemies = []
         for bullet in self.bullets:
-            if not bullet.update_pos():
+            hit_target = bullet.update_pos(self.enemies)
+            if hit_target is not None:
                 deleted_bullets.append(bullet)
+            if isinstance(hit_target, EnemyGrunt):
+                deleted_enemies.append(hit_target)
         for bullet in deleted_bullets:
             self.delete_bullet(bullet)
+        for enemy in deleted_enemies:
+            self.delete_enemy(enemy)
 
     def delete_bullet(self, bullet):
         if bullet in self.bullets:
             self.bullets.remove(bullet)
 
     def update_enemies(self):
-        deleted_enemies = []
-        deleted_bullets = []
         for enemy in self.enemies:
             enemy.update_direction((self.char.x, self.char.y))
-            hit_bullet = enemy.update_pos(self.bullets)
-            if hit_bullet is not None:
-                deleted_enemies.append(enemy)
-                deleted_bullets.append(hit_bullet)
-        for enemy in deleted_enemies:
-            self.delete_enemies(enemy)
-        for bullet in deleted_bullets:
-            self.delete_bullet(bullet)
+            enemy.update_pos()
 
-    def delete_enemies(self, enemy):
+    def delete_enemy(self, enemy):
         if enemy in self.enemies:
             self.enemies.remove(enemy)
 
@@ -62,4 +59,4 @@ class Observer:
     def spawn_enemy(self):
         x = random.choice([0, self.x])
         y = random.choice([0, self.y])
-        enemy = Enemy(x, y, self)
+        enemy = EnemyGrunt(x, y, self)

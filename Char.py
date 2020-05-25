@@ -8,7 +8,7 @@ class Char:
         self.y = observer.y / 2
         self.direct = 0
         self.speed = 5
-        self.strafe_speed = 2
+        self.strafe_speed = 5
         self.back_speed = 2
         self.observer = observer
         self.reload_time = 0
