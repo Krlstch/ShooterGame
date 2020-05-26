@@ -1,4 +1,6 @@
 import random
+from Char import Char
+from EnemyShooter import EnemyShooter
 from EnemyGrunt import EnemyGrunt
 
 
@@ -10,8 +12,9 @@ class Observer:
         self.enemies = set()
         self.char = None
         self.enemy_time = 0
-        self.max_enemy_time = 20
-        self.min_enemy_time = 1
+        self.max_enemy_time = 60
+        self.min_enemy_time = 20
+        self.game_state = 0  # 0 - game hasn't started, 1 - game has started, 2 - game is over
 
     def add_bullet(self, bullet):
         self.bullets.add(bullet)
@@ -29,8 +32,10 @@ class Observer:
             hit_target = bullet.update_pos(self.enemies)
             if hit_target is not None:
                 deleted_bullets.append(bullet)
-            if isinstance(hit_target, EnemyGrunt):
+            if isinstance(hit_target, EnemyGrunt) or isinstance(hit_target, EnemyShooter):
                 deleted_enemies.append(hit_target)
+            if isinstance(hit_target, Char):
+                self.game_over()
         for bullet in deleted_bullets:
             self.delete_bullet(bullet)
         for enemy in deleted_enemies:
@@ -42,8 +47,10 @@ class Observer:
 
     def update_enemies(self):
         for enemy in self.enemies:
-            enemy.update_direction((self.char.x, self.char.y))
-            enemy.update_pos()
+            enemy.update_direction()
+            hit = enemy.update_pos()
+            if hit:
+                self.game_over()
 
     def delete_enemy(self, enemy):
         if enemy in self.enemies:
@@ -59,4 +66,14 @@ class Observer:
     def spawn_enemy(self):
         x = random.choice([0, self.x])
         y = random.choice([0, self.y])
-        enemy = EnemyGrunt(x, y, self)
+        enemy_type = random.randint(1, 100)
+        if enemy_type <= 30:
+            enemy = EnemyShooter(x, y, self)
+        else:
+            enemy = EnemyGrunt(x, y, self)
+
+    def game_over(self):
+        self.game_state = 2  #game over
+        self.bullets = set()
+        self.enemies = set()
+        self.enemy_time = 0
