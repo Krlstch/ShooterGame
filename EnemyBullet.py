@@ -1,7 +1,7 @@
 import math
 
 
-class Bullet:
+class EnemyBullet:
     def __init__(self, x, y, direct, observer):
         self.x = x
         self.y = y
@@ -18,8 +18,7 @@ class Bullet:
         if self.x > self.observer.x or self.x < 0 or self.y > self.observer.y or self.y < 0:
             return 0  # hit wall
 
-        for enemy in enemies:
-            if math.pow(self.x - enemy.x, 2) + math.pow(self.y - enemy.y, 2) < math.pow(enemy.size, 2) or \
-                    math.pow(old_x - enemy.x, 2) + math.pow(old_y - enemy.y, 2) < math.pow(enemy.size, 2):
-                return enemy
+        if math.pow(self.x - self.observer.char.x, 2) + math.pow(self.y - self.observer.char.y, 2) < math.pow(self.observer.char.size, 2) or \
+                math.pow(old_x - self.observer.char.x, 2) + math.pow(old_y - self.observer.char.y, 2) < math.pow(self.observer.char.size, 2):
+            return self.observer.char
         return None
