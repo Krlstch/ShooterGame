@@ -60,7 +60,7 @@ class Observer:
     def delete_enemy(self, enemy):
         if enemy in self.enemies:
             self.enemies.remove(enemy)
-            self.score += 100
+            self.score += 100 + self.difficulty * 20
 
     def update_spawn_time(self):
         if self.enemy_time > 0:

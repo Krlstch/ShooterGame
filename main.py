@@ -10,11 +10,6 @@ def draw(gameDisplay, char, bullets, enemies):
     gameDisplay.fill((0, 0, 0))
     player_sprite_rotated = pygame.transform.rotate(player_sprite, - char.direct * 180 / math.pi)
     gameDisplay.blit(player_sprite_rotated, (int(char.x) - 10, int(char.y) - 10))
-    gameDisplay.blit(hud_screen, (0, observer.y))
-    text_score = font.render('Score: ' + str(observer.score), True, (255, 0, 0))
-    text_max_score = font.render('Best Score: ' + str(observer.max_score), True, (255, 0, 0))
-    gameDisplay.blit(text_score, (10, observer.y + 10))
-    gameDisplay.blit(text_max_score, (10, observer.y + 60))
     for bullet in bullets:
         pygame.draw.rect(gameDisplay, (255, 0, 0), (int(bullet.x), int(bullet.y), 3, 3))
     for enemy in enemies:
@@ -23,6 +18,15 @@ def draw(gameDisplay, char, bullets, enemies):
         else:  # if isinstance(enemy, EnemyShooter):
             enemy_sprite_rotated = pygame.transform.rotate(enemy_shooter_sprite, - enemy.direct * 180 / math.pi)
         gameDisplay.blit(enemy_sprite_rotated, (int(enemy.x) - 10, int(enemy.y) - 10))
+    gameDisplay.blit(hud_screen, (0, observer.y))
+    text_score = font.render('Score: ' + str(observer.score), True, (255, 0, 0))
+    text_max_score = font.render('Best Score: ' + str(observer.max_score), True, (255, 0, 0))
+    gameDisplay.blit(text_score, (10, observer.y + 10))
+    gameDisplay.blit(text_max_score, (10, observer.y + 60))
+    pygame.draw.rect(gameDisplay, (127, 127, 127), (observer.x - 210, observer.y + 60, 200, 20))
+    pygame.draw.rect(gameDisplay, (175, 175, 175), (observer.x - 208, observer.y + 62, 196, 16))
+    pygame.draw.rect(gameDisplay, (255, 0, 0), (observer.x - 208, observer.y + 62, 196 * (char.reload_time / char.max_reload_time), 16))
+
     pygame.display.update()
 
 
@@ -54,6 +58,8 @@ def take_input():
         char.update_position("d")
 
     if mouse[0]:
+        if char.reload_time == 0:
+            shoot_sound.play()
         char.shoot()
 
 
@@ -73,7 +79,9 @@ if __name__ == "__main__":
     difficulty = {0: "Difficulty_veasy.png", 1: "Difficulty_easy.png", 2: "Difficulty_medium.png", 3: "Difficulty_hard.png", 4: "Difficulty_vhard.png"}
     observer = Observer(800, 600, best_score)
     pygame.init()
+
     gameDisplay = pygame.display.set_mode((observer.x, observer.y + 100))
+    shoot_sound = pygame.mixer.Sound('shoot.wav')
     pygame.display.set_caption('Alien Shooter')
     play_screen = pygame.image.load('Start.png')
     game_over_screen = pygame.image.load('game_over.png')
@@ -106,6 +114,10 @@ if __name__ == "__main__":
                     observer.game_state = 0
 
         if observer.game_state == 0:
+            observer.new_record = False
+            char.x = observer.x / 2
+            char.y = observer.y / 2
+            gameDisplay.fill((0, 0, 0))
             gameDisplay.blit(play_screen, (0, 0))
             gameDisplay.blit(difficulty_screen, (260, 276))
             pygame.display.update()
