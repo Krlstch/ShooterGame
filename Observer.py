@@ -17,8 +17,8 @@ class Observer:
         self.enemies = set()
         self.char = None
         self.enemy_time = 0
-        self.max_enemy_time = 40 + len(self.enemies) * 10 - self.difficulty * 5
-        self.min_enemy_time = min(0 + len(self.enemies) * 15 - self.difficulty * 5, 0)
+        self.max_enemy_time = 300 + len(self.enemies) * 10 - self.difficulty * 15
+        self.min_enemy_time = max(0 + len(self.enemies) * 15 - self.difficulty * 5, 0)
         self.game_state = 0  # 0 - game hasn't started, 1 - game has started, 2 - game is over
 
     def add_bullet(self, bullet):

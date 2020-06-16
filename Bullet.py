@@ -6,7 +6,7 @@ class Bullet:
         self.x = x
         self.y = y
         self.direct = direct
-        self.speed = 20
+        self.speed = 3
         self.observer = observer
         observer.add_bullet(self)
 

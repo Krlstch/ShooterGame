@@ -6,7 +6,7 @@ class EnemyGrunt:
         self.x = x
         self.y = y
         self.direct = 0
-        self.speed = 10 + observer.difficulty
+        self.speed = 1 + 0.1 * observer.difficulty
         self.observer = observer
         self.size = 10
         observer.add_enemy(self)

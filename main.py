@@ -4,6 +4,7 @@ from Char import Char
 from EnemyGrunt import EnemyGrunt
 from EnemyShooter import EnemyShooter
 from Observer import Observer
+import time
 
 
 def draw(gameDisplay, char, bullets, enemies):
@@ -41,7 +42,7 @@ def spawn_enemy(observer):
     observer.update_spawn_time()
 
 
-def take_input():
+def take_input(lmb_pressed):
     keys = pygame.key.get_pressed()
     mouse = pygame.mouse.get_pressed()
 
@@ -58,9 +59,15 @@ def take_input():
         char.update_position("d")
 
     if mouse[0]:
-        if char.reload_time == 0:
-            shoot_sound.play()
-        char.shoot()
+        if not lmb_pressed:
+            if char.reload_time == 0:
+                shoot_sound.play()
+            char.shoot()
+            lmb_pressed = True
+    else:
+        lmb_pressed = False
+
+    return lmb_pressed
 
 
 if __name__ == "__main__":
@@ -94,9 +101,11 @@ if __name__ == "__main__":
     font = pygame.font.SysFont("Arial", 32)
     font_large = pygame.font.SysFont("Arial", 64)
     run = True
+    target_fps = 60
+    prev_time = time.time()
+    lmb_pressed = False
 
     while run:
-        pygame.time.delay(100)
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 run = False
@@ -123,7 +132,7 @@ if __name__ == "__main__":
             pygame.display.update()
 
         elif observer.game_state == 1:
-            take_input()
+            lmb_pressed = take_input(lmb_pressed)
             spawn_enemy(observer)
             update(char, observer)
             draw(gameDisplay, char, observer.bullets, observer.enemies)
@@ -140,6 +149,14 @@ if __name__ == "__main__":
                 text_game_over = font.render('New Record !', True, (255, 0, 0))
                 gameDisplay.blit(text_game_over, (observer.x / 2 - 16 * 9, observer.y / 2 + 144))
             pygame.display.update()
+
+        curr_time = time.time()  # so now we have time after processing
+        diff = curr_time - prev_time  # frame took this much time to process and render
+        delay = max(1.0 / target_fps - diff,
+                    0)  # if we finished early, wait the remaining time to desired fps, else wait 0 ms!
+        time.sleep(delay)
+        fps = 1.0 / (delay + diff)  # fps is based on total time ("processing" diff time + "wasted" delay time)
+        prev_time = curr_time
 
     pygame.quit()
     quit()
