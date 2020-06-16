@@ -106,7 +106,7 @@ if __name__ == "__main__":
     char = Char(observer)
     weapon = Weapon(7, 120, 30, char)
     pygame.init()
-    gameDisplay = pygame.display.set_mode((observer.x, observer.y + 100))
+    game_display = pygame.display.set_mode((observer.x, observer.y + 100))
 
     # load graphics
     difficulty = {0: "images/Difficulty_veasy.png", 1: "images/Difficulty_easy.png", 2: "images/Difficulty_medium.png",
@@ -156,28 +156,28 @@ if __name__ == "__main__":
             weapon.ammo = weapon.max_ammo
             weapon.reload_time = -1
             weapon.delay = 0
-            gameDisplay.fill((0, 0, 0))
-            gameDisplay.blit(play_screen, (0, 0))
-            gameDisplay.blit(difficulty_screen, (295, 276))
+            game_display.fill((0, 0, 0))
+            game_display.blit(play_screen, (0, 0))
+            game_display.blit(difficulty_screen, (295, 276))
             pygame.display.update()
 
         elif observer.game_state == 1:  #In game
             lmb_pressed = take_input(lmb_pressed)
             spawn_enemy(observer)
             update(char, observer, weapon)
-            draw(gameDisplay, char, weapon, observer.bullets, observer.enemies)
+            draw(game_display, char, weapon, observer.bullets, observer.enemies)
 
         else:  # End screen
-            gameDisplay.fill((0, 0, 0))
+            game_display.fill((0, 0, 0))
             text_game_over = font_large.render('You Died', True, (255, 0, 0))
-            gameDisplay.blit(text_game_over, (observer.x / 2 - 32 * 8, observer.y / 2 - 32 * 5))
+            game_display.blit(text_game_over, (observer.x / 2 - 32 * 8, observer.y / 2 - 32 * 5))
             text_game_over = font.render('Score: ' + str(observer.old_score), True, (255, 0, 0))
-            gameDisplay.blit(text_game_over, (observer.x / 2 - 64 * 1, observer.y / 2 + 16))
+            game_display.blit(text_game_over, (observer.x / 2 - 64 * 1, observer.y / 2 + 16))
             text_game_over = font.render('Best Score: ' + str(observer.max_score), True, (255, 0, 0))
-            gameDisplay.blit(text_game_over, (observer.x / 2 - 16 * 4, observer.y / 2 + 80))
+            game_display.blit(text_game_over, (observer.x / 2 - 16 * 4, observer.y / 2 + 80))
             if observer.new_record:
                 text_game_over = font.render('New Record !', True, (255, 0, 0))
-                gameDisplay.blit(text_game_over, (observer.x / 2 - 16 * 4, observer.y / 2 + 144))
+                game_display.blit(text_game_over, (observer.x / 2 - 16 * 4, observer.y / 2 + 144))
             pygame.display.update()
 
         # Handle time
