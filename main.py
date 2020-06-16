@@ -9,35 +9,35 @@ from Observer import Observer
 import time
 
 
-def draw(gameDisplay, char, weapon, bullets, enemies):
-    gameDisplay.fill((0, 0, 0))
+def draw(game_display, char, weapon, bullets, enemies):
+    game_display.fill((0, 0, 0))
     # player
     player_sprite_rotated = pygame.transform.rotate(player_sprite, - char.direct * 180 / math.pi)
-    gameDisplay.blit(player_sprite_rotated, (int(char.x) - 10, int(char.y) - 10))
+    game_display.blit(player_sprite_rotated, (int(char.x) - 10, int(char.y) - 10))
     # bullets
     for bullet in bullets:
-        pygame.draw.rect(gameDisplay, (255, 0, 0), (int(bullet.x), int(bullet.y), 3, 3))
+        pygame.draw.rect(game_display, (255, 0, 0), (int(bullet.x), int(bullet.y), 3, 3))
     # enemies
     for enemy in enemies:
         if isinstance(enemy, EnemyGrunt):
             enemy_sprite_rotated = pygame.transform.rotate(enemy_grunt_sprite, - enemy.direct * 180 / math.pi)
         else:  # if isinstance(enemy, EnemyShooter):
             enemy_sprite_rotated = pygame.transform.rotate(enemy_shooter_sprite, - enemy.direct * 180 / math.pi)
-        gameDisplay.blit(enemy_sprite_rotated, (int(enemy.x) - 10, int(enemy.y) - 10))
+        game_display.blit(enemy_sprite_rotated, (int(enemy.x) - 10, int(enemy.y) - 10))
     # HUD
-    gameDisplay.blit(hud_screen, (0, observer.y))
+    game_display.blit(hud_screen, (0, observer.y))
     text_score = font.render('Score: ' + str(observer.score), True, (255, 0, 0))
     text_max_score = font.render('Best Score: ' + str(observer.max_score), True, (255, 0, 0))
-    gameDisplay.blit(text_score, (10, observer.y + 10))
-    gameDisplay.blit(text_max_score, (10, observer.y + 60))
+    game_display.blit(text_score, (10, observer.y + 10))
+    game_display.blit(text_max_score, (10, observer.y + 60))
     # HUD - reload
-    pygame.draw.rect(gameDisplay, (127, 127, 127), (observer.x - 210, observer.y + 60, 200, 20))
-    pygame.draw.rect(gameDisplay, (175, 175, 175), (observer.x - 208, observer.y + 62, 196, 16))
+    pygame.draw.rect(game_display, (127, 127, 127), (observer.x - 210, observer.y + 60, 200, 20))
+    pygame.draw.rect(game_display, (175, 175, 175), (observer.x - 208, observer.y + 62, 196, 16))
     if weapon.reload_time == -1:
-        pygame.draw.rect(gameDisplay, (255, 0, 0),
+        pygame.draw.rect(game_display, (255, 0, 0),
                          (observer.x - 208, observer.y + 62, 196 * (weapon.ammo / weapon.max_ammo), 16))
     else:
-        pygame.draw.rect(gameDisplay, (255, 0, 0),
+        pygame.draw.rect(game_display, (255, 0, 0),
                          (observer.x - 208, observer.y + 62, 196 * (weapon.reload_time / weapon.max_reload_time), 16))
 
     pygame.display.update()
