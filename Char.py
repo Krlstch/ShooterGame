@@ -8,12 +8,9 @@ class Char:
         self.y = observer.y / 2
         self.direct = 0
         self.speed = 0.8
-        self.strafe_speed = 8
-        self.back_speed = 4
         self.observer = observer
-        self.reload_time = 0
-        self.max_reload_time = 60
         self.size = 10
+        self.weapon = None
         observer.add_char(self)
 
     def update_direction(self, cursor_pos):
@@ -71,11 +68,11 @@ class Char:
         if self.y > self.observer.y:
             self.y = self.observer.y
 
-    def update_reload(self):
-        if self.reload_time > 0:
-            self.reload_time -= 1
-
     def shoot(self):
-        if self.reload_time == 0:
+        shoot = self.weapon.shoot()
+        if shoot == 1:
             bullet = Bullet(self.x, self.y, self.direct, self.observer)
-            self.reload_time = self.max_reload_time
+        return shoot
+
+    def add_weapon(self, weapon):
+        self.weapon = weapon
