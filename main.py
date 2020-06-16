@@ -96,7 +96,8 @@ if __name__ == "__main__":
         best_score = 0
     file_best_score.close()
 
-    difficulty = {0: "Difficulty_veasy.png", 1: "Difficulty_easy.png", 2: "Difficulty_medium.png", 3: "Difficulty_hard.png", 4: "Difficulty_vhard.png"}
+    difficulty = {0: "images/Difficulty_veasy.png", 1: "images/Difficulty_easy.png", 2: "images/Difficulty_medium.png",
+                  3: "images/Difficulty_hard.png", 4: "images/Difficulty_vhard.png"}
     observer = Observer(800, 600, best_score)
     char = Char(observer)
     weapon = Weapon(7, 120, 30, char)
@@ -106,12 +107,12 @@ if __name__ == "__main__":
     shoot_sound = pygame.mixer.Sound('sound/shoot.wav')
     reload_sound = pygame.mixer.Sound('sound/reload.wav')
     pygame.display.set_caption('Alien Shooter')
-    play_screen = pygame.image.load('Start.png')
-    game_over_screen = pygame.image.load('game_over.png')
-    player_sprite = pygame.image.load('player.png')
-    enemy_grunt_sprite = pygame.image.load('EnemyGrunt.png')
-    enemy_shooter_sprite = pygame.image.load('EnemyShooter.png')
-    hud_screen = pygame.image.load('Hud.png')
+    play_screen = pygame.image.load('images/Start.png')
+    game_over_screen = pygame.image.load('images/game_over.png')
+    player_sprite = pygame.image.load('images/player.png')
+    enemy_grunt_sprite = pygame.image.load('images/EnemyGrunt.png')
+    enemy_shooter_sprite = pygame.image.load('images/EnemyShooter.png')
+    hud_screen = pygame.image.load('images/Hud.png')
     difficulty_screen = pygame.image.load(difficulty[observer.difficulty])
 
     font = pygame.font.SysFont("Arial", 32)
