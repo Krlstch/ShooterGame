@@ -26,24 +26,6 @@ class Char:
                 math.sqrt(math.pow(cursor_pos[1] - self.y, 2) + math.pow(cursor_pos[0] - self.x, 2)))
 
     def update_position(self, button):
-
-        """
-        if button == "w":
-            self.x += self.speed * math.cos(self.direct)
-            self.y += self.speed * math.sin(self.direct)
-
-        if button == "s":
-            self.x += self.back_speed * math.cos(self.direct + math.pi)
-            self.y += self.back_speed * math.sin(self.direct + math.pi)
-
-        if button == "a":
-            self.x += self.strafe_speed * math.cos(self.direct - math.pi / 2)
-            self.y += self.strafe_speed * math.sin(self.direct - math.pi / 2)
-
-        if button == "d":
-            self.x += self.strafe_speed * math.cos(self.direct + math.pi / 2)
-            self.y += self.strafe_speed * math.sin(self.direct + math.pi / 2)
-        """
         if button == "w":
             self.y -= self.speed
 
@@ -56,6 +38,7 @@ class Char:
         if button == "d":
             self.x += self.speed
 
+        # Deal with borders
         if self.x < 0:
             self.x = 0
 
@@ -69,7 +52,7 @@ class Char:
             self.y = self.observer.y
 
     def shoot(self):
-        shoot = self.weapon.shoot()
+        shoot = self.weapon.shoot()  # check if weapon can shoot
         if shoot == 1:
             bullet = Bullet(self.x, self.y, self.direct, self.observer)
         return shoot

@@ -18,8 +18,10 @@ class Bullet:
         if self.x > self.observer.x or self.x < 0 or self.y > self.observer.y or self.y < 0:
             return 0  # hit wall
 
+        # check if it hit an enemy
         for enemy in enemies:
             if math.pow(self.x - enemy.x, 2) + math.pow(self.y - enemy.y, 2) < math.pow(enemy.size, 2) or \
                     math.pow(old_x - enemy.x, 2) + math.pow(old_y - enemy.y, 2) < math.pow(enemy.size, 2):
                 return enemy
-        return None
+
+        return None  # if it did not hit anything

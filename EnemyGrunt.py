@@ -15,14 +15,14 @@ class EnemyGrunt:
         self.x += self.speed * math.cos(self.direct)
         self.y += self.speed * math.sin(self.direct)
 
-        if math.pow(self.x - self.observer.char.x, 2) + math.pow(self.y - self.observer.char.y, 2) < math.pow(self.observer.char.size + self.size, 2):
-            return True
-        else:
-            return False
+        # check if enemy is overlapping with char
+        return math.pow(self.x - self.observer.char.x, 2) + math.pow(self.y - self.observer.char.y, 2) < \
+               math.pow(self.observer.char.size + self.size, 2)
 
     def update_direction(self):
         if (self.observer.char.x, self.observer.char.y) == (self.x, self.y):
             pass
+
         elif self.observer.char.x > self.x:
             self.direct = math.asin(
                 (self.observer.char.y - self.y) /
@@ -31,5 +31,3 @@ class EnemyGrunt:
             self.direct = math.pi - math.asin(
                 (self.observer.char.y - self.y) /
                 math.sqrt(math.pow(self.observer.char.y - self.y, 2) + math.pow(self.observer.char.x - self.x, 2)))
-
-

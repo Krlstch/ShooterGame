@@ -18,7 +18,8 @@ class EnemyBullet:
         if self.x > self.observer.x or self.x < 0 or self.y > self.observer.y or self.y < 0:
             return 0  # hit wall
 
+        # check if it hit a player
         if math.pow(self.x - self.observer.char.x, 2) + math.pow(self.y - self.observer.char.y, 2) < math.pow(self.observer.char.size, 2) or \
                 math.pow(old_x - self.observer.char.x, 2) + math.pow(old_y - self.observer.char.y, 2) < math.pow(self.observer.char.size, 2):
             return self.observer.char
-        return None
+        return None # if it did not hit anything
