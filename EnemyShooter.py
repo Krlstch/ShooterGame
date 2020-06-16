@@ -8,12 +8,12 @@ class EnemyShooter:
         self.x = x
         self.y = y
         self.direct = 0
-        self.speed = 5
+        self.speed = 0.5
         self.observer = observer
         self.size = 10
         self.type = random.choice([-1, 1])
         self.reload_time = 0
-        self.max_reload_time = 60 - observer.difficulty * 5
+        self.max_reload_time = 300 - observer.difficulty * 10
         observer.add_enemy(self)
 
     def update_pos(self):
