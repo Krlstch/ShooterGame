@@ -1,5 +1,7 @@
 import math
 import pygame
+
+from Weapon import Weapon
 from Char import Char
 from EnemyGrunt import EnemyGrunt
 from EnemyShooter import EnemyShooter
@@ -7,7 +9,7 @@ from Observer import Observer
 import time
 
 
-def draw(gameDisplay, char, bullets, enemies):
+def draw(gameDisplay, char, weapon, bullets, enemies):
     gameDisplay.fill((0, 0, 0))
     player_sprite_rotated = pygame.transform.rotate(player_sprite, - char.direct * 180 / math.pi)
     gameDisplay.blit(player_sprite_rotated, (int(char.x) - 10, int(char.y) - 10))
@@ -26,14 +28,19 @@ def draw(gameDisplay, char, bullets, enemies):
     gameDisplay.blit(text_max_score, (10, observer.y + 60))
     pygame.draw.rect(gameDisplay, (127, 127, 127), (observer.x - 210, observer.y + 60, 200, 20))
     pygame.draw.rect(gameDisplay, (175, 175, 175), (observer.x - 208, observer.y + 62, 196, 16))
-    pygame.draw.rect(gameDisplay, (255, 0, 0), (observer.x - 208, observer.y + 62, 196 * (char.reload_time / char.max_reload_time), 16))
+    if weapon.reload_time == -1:
+        pygame.draw.rect(gameDisplay, (255, 0, 0),
+                         (observer.x - 208, observer.y + 62, 196 * (weapon.ammo / weapon.max_ammo), 16))
+    else:
+        pygame.draw.rect(gameDisplay, (255, 0, 0),
+                         (observer.x - 208, observer.y + 62, 196 * (weapon.reload_time / weapon.max_reload_time), 16))
 
     pygame.display.update()
 
 
-def update(char, observer):
+def update(char, observer, weapon):
     char.update_direction(pygame.mouse.get_pos())
-    char.update_reload()
+    weapon.update_reload_time()
     observer.update_bullets()
     observer.update_enemies()
 
@@ -58,11 +65,17 @@ def take_input(lmb_pressed):
     if keys[pygame.K_d]:
         char.update_position("d")
 
+    if keys[pygame.K_r]:
+        if char.weapon.reload() == -1:
+            reload_sound.play()
+
     if mouse[0]:
         if not lmb_pressed:
-            if char.reload_time == 0:
+            shoot = char.shoot()
+            if shoot == 1:
                 shoot_sound.play()
-            char.shoot()
+            if shoot == -1:
+                reload_sound.play()
             lmb_pressed = True
     else:
         lmb_pressed = False
@@ -85,10 +98,13 @@ if __name__ == "__main__":
 
     difficulty = {0: "Difficulty_veasy.png", 1: "Difficulty_easy.png", 2: "Difficulty_medium.png", 3: "Difficulty_hard.png", 4: "Difficulty_vhard.png"}
     observer = Observer(800, 600, best_score)
+    char = Char(observer)
+    weapon = Weapon(7, 120, 30, char)
     pygame.init()
 
     gameDisplay = pygame.display.set_mode((observer.x, observer.y + 100))
-    shoot_sound = pygame.mixer.Sound('shoot.wav')
+    shoot_sound = pygame.mixer.Sound('sound/shoot.wav')
+    reload_sound = pygame.mixer.Sound('sound/reload.wav')
     pygame.display.set_caption('Alien Shooter')
     play_screen = pygame.image.load('Start.png')
     game_over_screen = pygame.image.load('game_over.png')
@@ -97,13 +113,13 @@ if __name__ == "__main__":
     enemy_shooter_sprite = pygame.image.load('EnemyShooter.png')
     hud_screen = pygame.image.load('Hud.png')
     difficulty_screen = pygame.image.load(difficulty[observer.difficulty])
-    char = Char(observer)
+
     font = pygame.font.SysFont("Arial", 32)
-    font_large = pygame.font.SysFont("Arial", 64)
+    font_large = pygame.font.SysFont("Arial", 128)
     run = True
     target_fps = 60
     prev_time = time.time()
-    lmb_pressed = False
+    lmb_pressed = True
 
     while run:
         for event in pygame.event.get():
@@ -112,50 +128,53 @@ if __name__ == "__main__":
             elif event.type == pygame.MOUSEBUTTONDOWN or \
                     event.type == pygame.KEYDOWN:
                 if observer.game_state == 0:
-                    if 260 < pygame.mouse.get_pos()[0] < 469 and 193 < pygame.mouse.get_pos()[1] < 256:  # start
+                    if 295 < pygame.mouse.get_pos()[0] < 504 and 193 < pygame.mouse.get_pos()[1] < 256:  # start
                         observer.game_state = 1
-                    elif 260 < pygame.mouse.get_pos()[0] < 469 and 358 < pygame.mouse.get_pos()[1] < 418:  # end
+                    elif 295 < pygame.mouse.get_pos()[0] < 504 and 358 < pygame.mouse.get_pos()[1] < 418:  # end
                         run = False
-                    elif 260 < pygame.mouse.get_pos()[0] < 469 and 276 < pygame.mouse.get_pos()[1] < 336:  # difficulty
+                    elif 295 < pygame.mouse.get_pos()[0] < 504 and 276 < pygame.mouse.get_pos()[1] < 336:  # difficulty
                         observer.difficulty = (observer.difficulty + 1) % 5
                         difficulty_screen = pygame.image.load(difficulty[observer.difficulty])
                 if observer.game_state == 2:
                     observer.game_state = 0
 
         if observer.game_state == 0:
+            lmb_pressed = True
             observer.new_record = False
             char.x = observer.x / 2
             char.y = observer.y / 2
+            weapon.ammo = weapon.max_ammo
+            weapon.reload_time = -1
+            weapon.delay = 0
             gameDisplay.fill((0, 0, 0))
             gameDisplay.blit(play_screen, (0, 0))
-            gameDisplay.blit(difficulty_screen, (260, 276))
+            gameDisplay.blit(difficulty_screen, (295, 276))
             pygame.display.update()
 
         elif observer.game_state == 1:
             lmb_pressed = take_input(lmb_pressed)
             spawn_enemy(observer)
-            update(char, observer)
-            draw(gameDisplay, char, observer.bullets, observer.enemies)
+            update(char, observer, weapon)
+            draw(gameDisplay, char, weapon, observer.bullets, observer.enemies)
 
         else:
             gameDisplay.fill((0, 0, 0))
             text_game_over = font_large.render('You Died', True, (255, 0, 0))
-            gameDisplay.blit(text_game_over, (observer.x / 2 - 64 * 3, observer.y / 2 - 64))
+            gameDisplay.blit(text_game_over, (observer.x / 2 - 32 * 8, observer.y / 2 - 32 * 5))
             text_game_over = font.render('Score: ' + str(observer.old_score), True, (255, 0, 0))
-            gameDisplay.blit(text_game_over, (observer.x / 2 - 64 * 2, observer.y / 2 + 16))
+            gameDisplay.blit(text_game_over, (observer.x / 2 - 64 * 1, observer.y / 2 + 16))
             text_game_over = font.render('Best Score: ' + str(observer.max_score), True, (255, 0, 0))
-            gameDisplay.blit(text_game_over, (observer.x / 2 - 32 * 5, observer.y / 2 + 80))
+            gameDisplay.blit(text_game_over, (observer.x / 2 - 16 * 4, observer.y / 2 + 80))
             if observer.new_record:
                 text_game_over = font.render('New Record !', True, (255, 0, 0))
-                gameDisplay.blit(text_game_over, (observer.x / 2 - 16 * 9, observer.y / 2 + 144))
+                gameDisplay.blit(text_game_over, (observer.x / 2 - 16 * 4, observer.y / 2 + 144))
             pygame.display.update()
 
-        curr_time = time.time()  # so now we have time after processing
-        diff = curr_time - prev_time  # frame took this much time to process and render
-        delay = max(1.0 / target_fps - diff,
-                    0)  # if we finished early, wait the remaining time to desired fps, else wait 0 ms!
+        curr_time = time.time()
+        diff = curr_time - prev_time
+        delay = max(1.0 / target_fps - diff, 0)
         time.sleep(delay)
-        fps = 1.0 / (delay + diff)  # fps is based on total time ("processing" diff time + "wasted" delay time)
+        fps = 1.0 / (delay + diff)
         prev_time = curr_time
 
     pygame.quit()
