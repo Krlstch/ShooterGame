@@ -17,8 +17,8 @@ class Observer:
         self.enemies = set()
         self.char = None
         self.enemy_time = 0
-        self.max_enemy_time = 300 + len(self.enemies) * 10 - self.difficulty * 15
-        self.min_enemy_time = max(0 + len(self.enemies) * 15 - self.difficulty * 5, 0)
+        self.max_enemy_time = 300 + len(self.enemies) * 10 - self.difficulty * 15  # max time between spawning enemies
+        self.min_enemy_time = max(len(self.enemies) * 15 - self.difficulty * 5, 0)  # min time between spawning enemies
         self.game_state = 0  # 0 - game hasn't started, 1 - game has started, 2 - game is over
 
     def add_bullet(self, bullet):
@@ -34,16 +34,17 @@ class Observer:
         deleted_bullets = []
         deleted_enemies = []
         for bullet in self.bullets:
-            hit_target = bullet.update_pos(self.enemies)
-            if hit_target is not None:
+            hit_target = bullet.update_pos(self.enemies)  #check if bullet hit anything
+            if hit_target is not None:  #if it hit anything set it to be removed
                 deleted_bullets.append(bullet)
             if isinstance(hit_target, EnemyGrunt) or isinstance(hit_target, EnemyShooter):
+                # if it hit enemy set it to be destroyed
                 deleted_enemies.append(hit_target)
             if isinstance(hit_target, Char):
                 self.game_over()
-        for bullet in deleted_bullets:
+        for bullet in deleted_bullets:  # delete bullets which were set to be destroyed
             self.delete_bullet(bullet)
-        for enemy in deleted_enemies:
+        for enemy in deleted_enemies:  # delete enemies which were set to be destroyed
             self.delete_enemy(enemy)
 
     def delete_bullet(self, bullet):
@@ -53,11 +54,11 @@ class Observer:
     def update_enemies(self):
         for enemy in self.enemies:
             enemy.update_direction()
-            hit = enemy.update_pos()
-            if hit:
+            if enemy.update_pos():  # if enemy collided with char
                 self.game_over()
 
     def delete_enemy(self, enemy):
+        # remove enemy and update the score
         if enemy in self.enemies:
             self.enemies.remove(enemy)
             self.score += 100 + self.difficulty * 20
@@ -66,6 +67,7 @@ class Observer:
         if self.enemy_time > 0:
             self.enemy_time -= 1
         else:
+            # if time has come spawn an enemy and set new spawn time from [min_enemy_time, max_enemy_time]
             self.spawn_enemy()
             self.enemy_time = random.randint(self.min_enemy_time, self.max_enemy_time)
 
@@ -80,13 +82,15 @@ class Observer:
 
     def game_over(self):
         self.game_state = 2  #game over
+        # reset variables
         self.bullets = set()
         self.enemies = set()
         self.enemy_time = 0
         self.old_score = self.score
-        if self.score > self.max_score:
+        if self.score > self.max_score:  # check if new record has been set
             self.max_score = self.score
             self.new_record = True
             file_best_score = open("Best Score.txt", "w")
             file_best_score.write(str(self.max_score))
+            file_best_score.close()
         self.score = 0

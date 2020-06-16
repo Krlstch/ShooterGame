@@ -33,10 +33,9 @@ class EnemyShooter:
         else:
             self.reload_time -= 1
 
-        if math.pow(self.x - self.observer.char.x, 2) + math.pow(self.y - self.observer.char.y, 2) < math.pow(self.observer.char.size + self.size, 2):
-            return True
-        else:
-            return False
+        # check if enemy is overlapping with char
+        return math.pow(self.x - self.observer.char.x, 2) + math.pow(self.y - self.observer.char.y, 2) < \
+               math.pow(self.observer.char.size + self.size, 2)
 
     def update_direction(self):
         if (self.observer.char.x, self.observer.char.y) == (self.x, self.y):
